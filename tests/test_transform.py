@@ -103,3 +103,44 @@ def test_empty_wavelength_transform(xslt_path: str, czi_xml_filename: str, expec
 
     # Test that the resulting XML can be read by OME-Types
     from_xml(omexml_str)
+
+@pytest.mark.parametrize(
+    "acquisition_mode, immersion, expected_mode, expected_immersion",
+    [
+        # Values written by ZEN that the OME schema does not define
+        ("LatticeLightsheet", "User Medium", "Other", "Other"),
+        # Values the OME schema does define pass through unchanged
+        ("SPIM", "Water", "SPIM", "Water"),
+    ],
+)
+def test_enum_values_outside_ome_map_to_other(
+    xslt_path: str,
+    acquisition_mode: str,
+    immersion: str,
+    expected_mode: str,
+    expected_immersion: str,
+):
+    # Arrange
+    czixml = ET.parse(str(RESOURCES_DIR / "s_3_t_1_c_3_z_5.czi.xml"))
+    channels = czixml.findall(".//Information/Image/Dimensions/Channels/Channel")
+    objectives = czixml.findall(".//Information/Instrument/Objectives/Objective")
+    assert channels and objectives
+    for channel in channels:
+        channel.find("AcquisitionMode").text = acquisition_mode
+    for objective in objectives:
+        objective.find("Immersion").text = immersion
+    for medium in czixml.findall(".//Information/Image/ObjectiveSettings/Medium"):
+        medium.text = immersion
+    transformer = ET.XSLT(ET.parse(xslt_path))
+
+    # Act
+    ome = from_xml(str(transformer(czixml)))
+
+    # Assert
+    assert [c.acquisition_mode.value for c in ome.images[0].pixels.channels] == [
+        expected_mode
+    ] * len(channels)
+    assert [o.immersion.value for o in ome.instruments[0].objectives] == [
+        expected_immersion
+    ] * len(objectives)
+    assert ome.images[0].objective_settings.medium.value == expected_immersion

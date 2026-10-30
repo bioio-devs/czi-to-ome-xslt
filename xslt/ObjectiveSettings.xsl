@@ -8,10 +8,20 @@
         </xsl:attribute>
     </xsl:template>
 
+    <!-- ZEN writes media that OME does not define (e.g. 'User Medium'); map those to Other -->
     <xsl:template match="Medium">
-        <xsl:attribute name="Medium">
-            <xsl:value-of select="."/>
-        </xsl:attribute>
+        <xsl:if test="string-length(.) &gt; 0">
+            <xsl:attribute name="Medium">
+                <xsl:choose>
+                    <xsl:when test="contains(' Air Oil Water Glycerol Other ', concat(' ', ., ' '))">
+                        <xsl:value-of select="."/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>Other</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="RefractiveIndex">

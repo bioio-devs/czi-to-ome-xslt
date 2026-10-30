@@ -93,8 +93,17 @@
                 <xsl:value-of select="@Name"/>
             </xsl:attribute>
             <xsl:if test="AcquisitionMode and string-length(AcquisitionMode) &gt; 0">
+                <!-- ZEN writes modes that OME does not define (e.g. LatticeLightsheet); map those to Other -->
+                <xsl:variable name="ome_acquisition_modes" select="' WideField LaserScanningConfocalMicroscopy SpinningDiskConfocal SlitScanConfocal MultiPhotonMicroscopy StructuredIllumination SingleMoleculeImaging TotalInternalReflection FluorescenceLifetime SpectralImaging FluorescenceCorrelationSpectroscopy NearFieldScanningOpticalMicroscopy SecondHarmonicGenerationImaging PALM STORM STED TIRF FSM LCM Other BrightField SweptFieldConfocal SPIM '"/>
                 <xsl:attribute name="AcquisitionMode">
-                    <xsl:value-of select="AcquisitionMode"/>
+                    <xsl:choose>
+                        <xsl:when test="contains($ome_acquisition_modes, concat(' ', AcquisitionMode, ' '))">
+                            <xsl:value-of select="AcquisitionMode"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text>Other</xsl:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:attribute>
             </xsl:if>
             <xsl:apply-templates select="IlluminationType"/>

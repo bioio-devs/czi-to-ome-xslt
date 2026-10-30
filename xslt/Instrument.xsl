@@ -171,9 +171,17 @@ ome/ome.xsd: 979 # # This means that for more details on how this section of the
                         <xsl:value-of select="Correction"/>
                     </xsl:attribute>
                 </xsl:if>
-                <xsl:if test="Immersion">
+                <xsl:if test="Immersion and string-length(Immersion) &gt; 0">
+                    <!-- ZEN writes media that OME does not define (e.g. 'User Medium'); map those to Other -->
                     <xsl:attribute name="Immersion">
-                        <xsl:value-of select="Immersion"/>
+                        <xsl:choose>
+                            <xsl:when test="contains(' Oil Water WaterDipping Air Multi Glycerol Other ', concat(' ', Immersion, ' '))">
+                                <xsl:value-of select="Immersion"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text>Other</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:attribute>
                 </xsl:if>
                 <xsl:if test="LensNA">
