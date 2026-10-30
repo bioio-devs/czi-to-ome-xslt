@@ -1,6 +1,6 @@
 # czi-to-ome-xslt
 
-[![Build Status](https://github.com/AllenCellModeling/czi-to-ome-xslt/workflows/Test%20Main/badge.svg)](https://github.com/AllenCellModeling/czi-to-ome-xslt/actions/test-main.yml)
+[![Build Status](https://github.com/bioio-devs/czi-to-ome-xslt/workflows/Test%20Main/badge.svg)](https://github.com/bioio-devs/czi-to-ome-xslt/actions/test-main.yml)
 
 XSLT files to convert from CZI (Zeiss) microscopy image metadata
 to OME image metadata schema.
@@ -13,7 +13,7 @@ If you want to use this work in a standalone fashion we recommend submoduling
 this repository into your own repo:
 
 ```bash
-git submodule add https://github.com/AllenCellModeling/czi-to-ome-xslt.git
+git submodule add https://github.com/bioio-devs/czi-to-ome-xslt.git
 ```
 
 You can then run the transformation in any language of your choosing.
@@ -40,20 +40,22 @@ with open("your-converted-czi-metadata.ome.xml", "w") as open_f:
     open_f.write(str(omexml))
 ```
 
-This work has already been incorporated into
-[`aicsimageio`](https://github.com/AllenCellModeling/aicsimageio).
+This work is incorporated into
+[`bioio`](https://github.com/bioio-devs/bioio), in the [`bioio-czi`](https://github.com/bioio-devs/bioio-czi) module.
 
 ```python
-from aicsimageio import AICSImage
+from bioio import BioImage
 
-img = AICSImage("your-file.czi")
+img = BioImage("your-file.czi")
 img.ome_metadata
 ```
 
 ## EXSLT
+
 This work utilizes the EXSLT extensions for XSLT 1.0 (for example, the `str:tokenize` function). Popular XML libraries
 such as `lxml` have built in support for EXSLT. To use these extensions, include the necessary attributes on `<xsl:stylesheet>` in the
 file you are working on:
+
 ```
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -61,7 +63,9 @@ file you are working on:
     xmlns:str="http://exslt.org/strings" extension-element-prefixes="str">
     ...
 ```
+
 You can then use an EXSLT function like so:
+
 ```
 <xsl:value-of select="str:tokenize(/Some/Path, ',')" />
 ```
@@ -72,7 +76,6 @@ For more information on using EXSLT and the functions avaialbe, see the [EXSLT d
 
 For full metadata comparison between XSLT and Bioformats, see
 [comparison](./docs/comparison).
-
 
 ## Contributing
 
@@ -88,8 +91,6 @@ than Python**.
 For instructions on how to contribute new additions to the XSLT and/or tests, see
 [CONTRIBUTING](./docs/CONTRIBUTING.md).
 
-
 ---
 
-
-***Free software: BSD license***
+**_Free software: BSD license_**
